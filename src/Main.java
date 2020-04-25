@@ -4,7 +4,7 @@
 
 public class Main {
     public static void main(String[] args) {
-        final JavaSoundRecorder recorder = new JavaSoundRecorder();
+        JavaSoundRecorder recorder = new JavaSoundRecorder();
 
         // creates a new thread that waits for a specified
         // of time before stopping
