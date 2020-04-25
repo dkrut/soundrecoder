@@ -3,6 +3,7 @@ import com.dropbox.core.v2.DbxClientV2;
 
 import javax.sound.sampled.*;
 import java.io.*;
+import java.nio.file.Files;
 
 public class JavaSoundRecorder
 {
@@ -61,12 +62,13 @@ public class JavaSoundRecorder
                 try {
                     InputStream in = new FileInputStream(fileName);
                     client.files().uploadBuilder("/" + fileName).uploadAndFinish(in);
+                    in.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                //TODO: delete local file
+                Files.deleteIfExists(fileName.toPath());
             }
-            catch (InterruptedException e) {
+            catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
         }).start();
