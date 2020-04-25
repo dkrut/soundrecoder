@@ -1,7 +1,8 @@
 import javax.sound.sampled.*;
 import java.io.*;
 
-public class JavaSoundRecorder {
+public class JavaSoundRecorder
+{
     private AudioFileFormat.Type fileType;
     private TargetDataLine line;
     private AudioFormat audioFormat;
@@ -13,8 +14,7 @@ public class JavaSoundRecorder {
         int channels = 2;
         boolean signed = true;
         boolean bigEndian = true;
-        audioFormat = new AudioFormat(sampleRate, sampleSizeInBits,
-                channels, signed, bigEndian);
+        audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
         try {
             line = (TargetDataLine) AudioSystem.getLine(info);
@@ -26,23 +26,35 @@ public class JavaSoundRecorder {
     public void recordSound(long milliseconds, String filePath) {
         File file = new File(filePath);
         start(file);
-        //...
-        finish();
+        delayFinish(milliseconds);
     }
 
     private void start(File file) {
-        try {
-            line.open(audioFormat);
-            line.start();
-            AudioInputStream ais = new AudioInputStream(line);
-            AudioSystem.write(ais, fileType, file);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        new Thread(() ->
+        {
+            try {
+                line.open(audioFormat);
+                line.start();
+                AudioInputStream ais = new AudioInputStream(line);
+                AudioSystem.write(ais, fileType, file);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }).start();
     }
 
-    private void finish() {
-        line.stop();
-        line.close();
+    private void delayFinish(long delayTime) {
+        new Thread(() ->
+        {
+            try
+            {
+                Thread.sleep(delayTime);
+                line.stop();
+                line.close();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
