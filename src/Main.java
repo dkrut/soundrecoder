@@ -16,7 +16,14 @@ public class Main {
         }
 
         JavaSoundRecorder recorder = new JavaSoundRecorder(properties.getProperty("ACCESS_TOKEN"));
-
-        recorder.recordSound(60000);
+        long milliseconds = 60000;
+        try {
+            for (int i = 0; i < Integer.parseInt(properties.getProperty("iterationsCount")); i++) {
+                recorder.recordSound(milliseconds);
+                Thread.sleep(milliseconds + 100);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
