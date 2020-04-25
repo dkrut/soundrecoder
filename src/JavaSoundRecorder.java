@@ -13,7 +13,7 @@ public class JavaSoundRecorder
     private DbxRequestConfig config;
     private DbxClientV2 client;
 
-    public JavaSoundRecorder(String ACCESS_TOKEN) {
+    public JavaSoundRecorder(String accessToken) {
         fileType = AudioFileFormat.Type.WAVE;
         float sampleRate = 16000;
         int sampleSizeInBits = 16;
@@ -28,7 +28,7 @@ public class JavaSoundRecorder
             e.printStackTrace();
         }
         config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
-        client = new DbxClientV2(config, ACCESS_TOKEN);
+        client = new DbxClientV2(config, accessToken);
     }
 
     public void recordSound(long milliseconds, String filePath) {
@@ -63,12 +63,12 @@ public class JavaSoundRecorder
                     InputStream in = new FileInputStream(fileName);
                     client.files().uploadBuilder("/" + fileName).uploadAndFinish(in);
                     in.close();
+                    Files.deleteIfExists(fileName.toPath());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                Files.deleteIfExists(fileName.toPath());
             }
-            catch (InterruptedException | IOException e) {
+            catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }).start();
