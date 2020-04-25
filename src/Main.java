@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by Denis Krutikov on 25.04.2020.
  */
@@ -8,7 +11,13 @@ public class Main {
 
         JavaSoundRecorder recorder = new JavaSoundRecorder(ACCESS_TOKEN);
 
-        String fileName = "out/file.wav";  //TODO: change file name to current date
+        SimpleDateFormat formatter= new SimpleDateFormat("yyyyMMdd'_'HHmmss");
+        Date date = new Date(System.currentTimeMillis());
+
+        String fileName = formatter.format(date) + ".wav";
         recorder.recordSound(10000, fileName);
+
+
+
     }
 }
