@@ -1,7 +1,5 @@
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -19,9 +17,6 @@ public class Main {
 
         JavaSoundRecorder recorder = new JavaSoundRecorder(properties.getProperty("ACCESS_TOKEN"));
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd'_'HHmmss");
-        String fileName = formatter.format(new Date(System.currentTimeMillis())) + ".wav";
-
-        recorder.recordSound(10000, fileName);
+        recorder.recordSound(60000);
     }
 }

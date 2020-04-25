@@ -4,6 +4,8 @@ import com.dropbox.core.v2.DbxClientV2;
 import javax.sound.sampled.*;
 import java.io.*;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class JavaSoundRecorder
 {
@@ -12,6 +14,7 @@ public class JavaSoundRecorder
     private AudioFormat audioFormat;
     private DbxRequestConfig config;
     private DbxClientV2 client;
+    private SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd'_'HHmmss");
 
     public JavaSoundRecorder(String accessToken) {
         fileType = AudioFileFormat.Type.WAVE;
@@ -31,8 +34,8 @@ public class JavaSoundRecorder
         client = new DbxClientV2(config, accessToken);
     }
 
-    public void recordSound(long milliseconds, String filePath) {
-        File file = new File(filePath);
+    public void recordSound(long milliseconds) {
+        File file = new File(formatter.format(new Date(System.currentTimeMillis())) + ".wav");
         start(file);
         delayFinish(file, milliseconds);
     }
