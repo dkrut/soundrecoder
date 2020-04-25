@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         Properties properties = new Properties();
         try {
-            properties.load(new FileInputStream("src/app.properties"));
+            properties.load(new FileInputStream("src/main/resources/app.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
