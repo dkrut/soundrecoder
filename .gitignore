@@ -1,6 +1,7 @@
 # folders
 .idea
 out
+target
 
 # Properties
 *.properties
