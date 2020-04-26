@@ -29,8 +29,10 @@ public class JavaSoundRecorder
         audioFormat = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian);
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
         try {
+            log.info("Initializing Audio System");
             line = (TargetDataLine) AudioSystem.getLine(info);
-        } catch (LineUnavailableException e) {
+        } catch (LineUnavailableException |  IllegalArgumentException e) {
+            log.error("Error while Audio System initializing: " + e.getMessage());
             e.printStackTrace();
         }
         config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
@@ -56,7 +58,7 @@ public class JavaSoundRecorder
                 AudioSystem.write(ais, fileType, file);
                 log.info("Recording file '{}' finished", file.getName());
             } catch (Exception ex) {
-                log.error("Error during recording '{}': " + ex, file.getName());
+                log.error("Error during recording '{}': " + ex.getMessage(), file.getName());
                 ex.printStackTrace();
             }
         }).start();
@@ -80,12 +82,12 @@ public class JavaSoundRecorder
                     log.info("Delete local file version '{}'", fileName.getAbsolutePath());
                     Files.deleteIfExists(fileName.toPath());
                 } catch (Exception ex) {
-                    log.error("Error: " + ex);
+                    log.error("Error: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
             catch (InterruptedException e) {
-                log.error("Error in thread sleeping: " + e);
+                log.error("Error in thread sleeping: " + e.getMessage());
                 e.printStackTrace();
             }
         }).start();

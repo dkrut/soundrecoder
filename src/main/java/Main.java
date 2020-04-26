@@ -15,8 +15,10 @@ public class Main {
     public static void main(String[] args) {
         Properties properties = new Properties();
         try {
+            log.debug("Get dropbox ACCESS_TOKEN");
             properties.load(new FileInputStream("src/main/resources/app.properties"));
         } catch (IOException e) {
+            log.error("Error getting ACCESS_TOKEN from 'app.properties': " + e.getMessage());
             e.printStackTrace();
         }
 
@@ -34,7 +36,7 @@ public class Main {
                 Thread.sleep(milliseconds + 100);
             }
         } catch (InterruptedException e) {
-            log.error("Error in thread sleeping: " + e);
+            log.error("Error in thread sleeping: " + e.getMessage());
             e.printStackTrace();
         }
     }
