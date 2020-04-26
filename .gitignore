@@ -5,3 +5,6 @@ target
 
 # Properties
 *.properties
+
+# idea
+*.iml
