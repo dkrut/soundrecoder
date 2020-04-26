@@ -29,7 +29,7 @@ public class Main {
 
         try {
             for (int i = 0; i < iterationsCount; i++) {
-                log.info("Start iteration #" + (i+1));
+                log.info("Start iteration " + (i+1) + "/" + iterationsCount);
                 recorder.recordSound(milliseconds);
                 Thread.sleep(milliseconds + 100);
             }
