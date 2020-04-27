@@ -31,9 +31,10 @@ public class JavaSoundRecorder
         try {
             log.info("Initializing Audio System");
             line = (TargetDataLine) AudioSystem.getLine(info);
-        } catch (LineUnavailableException |  IllegalArgumentException e) {
+        } catch (Exception e) {
             log.error("Error while Audio System initializing: " + e.getMessage());
             e.printStackTrace();
+            System.exit(1);
         }
         config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
         client = new DbxClientV2(config, accessToken);
