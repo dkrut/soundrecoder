@@ -1,3 +1,5 @@
+package com.github.dkrut.soundrecoder;
+
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import org.slf4j.Logger;
