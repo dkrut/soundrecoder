@@ -3,10 +3,6 @@ package com.github.dkrut.soundrecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 /**
  * Created by Denis Krutikov on 25.04.2020.
  */
@@ -15,20 +11,12 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        Properties properties = new Properties();
-        try {
-            log.debug("Get dropbox ACCESS_TOKEN");
-            properties.load(new FileInputStream("src/main/resources/app.properties"));
-        } catch (IOException e) {
-            log.error("Error getting ACCESS_TOKEN from 'app.properties': " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        JavaSoundRecorder recorder = new JavaSoundRecorder(properties.getProperty("ACCESS_TOKEN"));
+        JavaSoundRecorder recorder = new JavaSoundRecorder();
         long milliseconds = 60000;
         log.info("Recording length value = " + milliseconds + " milliseconds");
 
-        int iterationsCount = Integer.parseInt(properties.getProperty("iterationsCount"));
+        Property property = new Property();
+        int iterationsCount = Integer.parseInt(property.getProperty("iterationsCount"));
         log.info("Iterations count = " + iterationsCount);
 
         try {

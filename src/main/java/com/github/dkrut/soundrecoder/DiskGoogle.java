@@ -20,13 +20,14 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 public class DiskGoogle {
 
     private static final Logger log = LoggerFactory.getLogger(DiskGoogle.class);
-    private static final String APPLICATION_NAME = "SoundRecoder";
+    private static final String APPLICATION_NAME = "SoundRecorder";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final java.io.File CREDENTIALS_FOLDER = new java.io.File("src/main/resources");
 
@@ -39,16 +40,16 @@ public class DiskGoogle {
 
     public DiskGoogle() {
         try {
-            log.info("Build a new authorized Google API client service");
+            log.debug("Build a new authorized Google API client service");
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            log.info("Load client secrets");
+            log.debug("Load client secrets");
             clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(clientSecretFilePath)));
-            log.info("Build flow and trigger user authorization request");
+            log.debug("Build flow and trigger user authorization request");
             flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
                     clientSecrets, Collections.singleton(DriveScopes.DRIVE_FILE))
                     .setDataStoreFactory(new FileDataStoreFactory(CREDENTIALS_FOLDER))
                     .setAccessType("offline").build();
-            log.info("Read client_secret.json file");
+            log.debug("Read client_secret.json file");
             credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
         } catch (GeneralSecurityException e) {
             log.error("Couldn't get Google transport: " + e.getMessage());
@@ -61,13 +62,19 @@ public class DiskGoogle {
         drive = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
     }
 
-    public void uploadFile(java.io.File fileName) {
+    public void uploadFile(java.io.File fileName, Boolean deleteAfter) {
         File fileMetadata = new File();
         fileMetadata.setName(fileName.getName());
         FileContent mediaContent = new FileContent("media/wave", fileName);
         try {
-            log.error("Uploading '{}' to Google Disk", fileName.getName());
+            log.info("Uploading file '{}' to Google Disk...", fileName.getName());
             drive.files().create(fileMetadata, mediaContent).execute();
+            log.info("Uploading file '{}' to Google Disk finished", fileName.getName());
+
+            if (deleteAfter) {
+                log.info("Delete local file version '{}'", fileName.getAbsolutePath());
+                Files.deleteIfExists(fileName.toPath());
+            }
         } catch (IOException e) {
         log.error("Couldn't upload file: " + e.getMessage());
             e.printStackTrace();

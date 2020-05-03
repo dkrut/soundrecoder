@@ -1,13 +1,10 @@
 package com.github.dkrut.soundrecoder;
 
-import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.v2.DbxClientV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.*;
-import java.io.*;
-import java.nio.file.Files;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -17,11 +14,9 @@ public class JavaSoundRecorder
     private AudioFileFormat.Type fileType;
     private TargetDataLine line;
     private AudioFormat audioFormat;
-    private DbxRequestConfig config;
-    private DbxClientV2 client;
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd'_'HHmmss");
 
-    public JavaSoundRecorder(String accessToken) {
+    public JavaSoundRecorder() {
         fileType = AudioFileFormat.Type.WAVE;
         float sampleRate = 16000;
         int sampleSizeInBits = 16;
@@ -38,8 +33,6 @@ public class JavaSoundRecorder
             e.printStackTrace();
             System.exit(1);
         }
-        config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
-        client = new DbxClientV2(config, accessToken);
     }
 
     public void recordSound(long milliseconds) {
@@ -68,6 +61,8 @@ public class JavaSoundRecorder
     }
 
     private void delayFinish(File fileName, long delayTime) {
+        Property property = new Property();
+        String cloud = property.getProperty("cloud").toLowerCase();
         new Thread(() ->
         {
             try
@@ -77,17 +72,16 @@ public class JavaSoundRecorder
                 line.stop();
                 log.debug("Line close");
                 line.close();
-                try {
-                    InputStream in = new FileInputStream(fileName);
-                    log.info("Upload file '{}' to dropbox", fileName.getName());
-                    client.files().uploadBuilder("/" + fileName).uploadAndFinish(in);
-                    in.close();
-                    log.info("Delete local file version '{}'", fileName.getAbsolutePath());
-                    Files.deleteIfExists(fileName.toPath());
-                } catch (Exception ex) {
-                    log.error("Error: " + ex.getMessage());
-                    ex.printStackTrace();
+                if (cloud.equals("dropbox")) {
+                    DiskDropbox diskDropbox = new DiskDropbox();
+                    diskDropbox.uploadFile(fileName, true);
+                    return;
                 }
+                if (cloud.equals("google")) {
+                    DiskGoogle diskGoogle = new DiskGoogle();
+                    diskGoogle.uploadFile(fileName, true);
+                }
+                else log.warn("File not uploaded to cloud. File left at '{}'", fileName.getAbsolutePath());
             }
             catch (InterruptedException e) {
                 log.error("Error in thread sleeping: " + e.getMessage());
