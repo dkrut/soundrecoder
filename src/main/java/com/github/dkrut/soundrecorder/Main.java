@@ -23,7 +23,7 @@ public class Main {
             for (int i = 0; i < iterationsCount; i++) {
                 log.info("Start iteration " + (i+1) + "/" + iterationsCount);
                 recorder.recordSound(milliseconds);
-                Thread.sleep(milliseconds + 100);
+                Thread.sleep(milliseconds);
             }
         } catch (InterruptedException e) {
             log.error("Error in thread sleeping: " + e.getMessage());
