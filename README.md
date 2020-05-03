@@ -1,4 +1,4 @@
-# SoundRecoder
+# SoundRecorder
 _sound recording on a microphone and sending to dropbox or google disk_
 
 A local microphone is used where the code is executed. One recording time is 60 seconds. File name consists of current datetime.

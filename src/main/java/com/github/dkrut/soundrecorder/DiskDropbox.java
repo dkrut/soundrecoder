@@ -1,4 +1,4 @@
-package com.github.dkrut.soundrecoder;
+package com.github.dkrut.soundrecorder;
 
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;

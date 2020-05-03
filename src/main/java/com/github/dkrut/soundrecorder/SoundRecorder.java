@@ -1,4 +1,4 @@
-package com.github.dkrut.soundrecoder;
+package com.github.dkrut.soundrecorder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
