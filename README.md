@@ -9,6 +9,6 @@ To upload recording to Google Disk, you should turn on Drive API and get `client
 
 
 Then, fill the _app.properties_: 
-- _cloud_ - dropbox or google(default = dropbox), 
-- _iterationsCount_ - how many times it will make recording and send file to cloud(default = 1),
+- _cloud_ - `dropbox` or `google`(default = dropbox), 
+- _iterationsCount_ - how many times it will make recording and send file to cloud(default = `1`),
 - _dropbox_access_token_(if use Dropbox). 
