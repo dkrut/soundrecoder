@@ -20,7 +20,7 @@ public class DiskDropbox {
     public DiskDropbox() {
         config = DbxRequestConfig.newBuilder("SoundRecorder").build();
         log.info("Create Dropbox client");
-        client = new DbxClientV2(config, property.getProperty("ACCESS_TOKEN"));
+        client = new DbxClientV2(config, property.getProperty("dropbox_access_token"));
     }
 
     public void uploadFile(File fileName, Boolean deleteAfter) {
