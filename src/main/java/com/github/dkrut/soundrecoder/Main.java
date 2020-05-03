@@ -11,7 +11,7 @@ public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        JavaSoundRecorder recorder = new JavaSoundRecorder();
+        SoundRecorder recorder = new SoundRecorder();
         long milliseconds = 60000;
         log.info("Recording length value = " + milliseconds + " milliseconds");
 

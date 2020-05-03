@@ -8,15 +8,15 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class JavaSoundRecorder
+public class SoundRecorder
 {
-    private static final Logger log = LoggerFactory.getLogger(JavaSoundRecorder.class);
+    private static final Logger log = LoggerFactory.getLogger(SoundRecorder.class);
     private AudioFileFormat.Type fileType;
     private TargetDataLine line;
     private AudioFormat audioFormat;
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd'_'HHmmss");
 
-    public JavaSoundRecorder() {
+    public SoundRecorder() {
         fileType = AudioFileFormat.Type.WAVE;
         float sampleRate = 16000;
         int sampleSizeInBits = 16;
@@ -81,7 +81,12 @@ public class JavaSoundRecorder
                     DiskGoogle diskGoogle = new DiskGoogle();
                     diskGoogle.uploadFile(fileName, true);
                 }
-                else log.warn("File not uploaded to cloud. File left at '{}'", fileName.getAbsolutePath());
+                else {
+                    log.warn("File '{}' not uploaded to cloud. Check 'cloud' value in 'app.properties'. " +
+                            "\nValid value: 'dropbox' or 'google'" +
+                            "\nCurrent value: '{}'", fileName.getName(), cloud);
+                    log.warn("File left at '{}'", fileName.getAbsolutePath());
+                }
             }
             catch (InterruptedException e) {
                 log.error("Error in thread sleeping: " + e.getMessage());

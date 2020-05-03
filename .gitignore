@@ -5,6 +5,7 @@ target
 
 # Properties
 *.properties
+*.json
 
 # idea
 *.iml

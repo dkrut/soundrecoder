@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 
@@ -29,14 +30,21 @@ public class DiskDropbox {
             client.files().uploadBuilder("/" + fileName).uploadAndFinish(in);
             in.close();
             log.info("Uploading file '{}' to Dropbox finished", fileName.getName());
+        } catch (Exception e) {
+            log.error("Couldn't upload file '{}': " + e.getMessage(), fileName.getName());
+            e.printStackTrace();
+            log.warn("File left at '{}'", fileName.getAbsolutePath());
+            return;
+        }
 
-            if (deleteAfter) {
+        if (deleteAfter) {
+            try {
                 log.info("Delete local file version '{}'", fileName.getAbsolutePath());
                 Files.deleteIfExists(fileName.toPath());
-            } else log.info("File left at '{}'", fileName.getAbsolutePath());
-        } catch (Exception ex) {
-            log.error("Couldn't upload file: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+            } catch (IOException e) {
+                log.warn("Couldn't delete file '{}': " + e.getMessage(), fileName.getName());
+                e.printStackTrace();
+            }
+        } else log.info("File left at '{}'", fileName.getAbsolutePath());
     }
 }

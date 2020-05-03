@@ -70,14 +70,21 @@ public class DiskGoogle {
             log.info("Uploading file '{}' to Google Disk...", fileName.getName());
             drive.files().create(fileMetadata, mediaContent).execute();
             log.info("Uploading file '{}' to Google Disk finished", fileName.getName());
+        } catch (IOException e) {
+            log.error("Couldn't upload file '{}': " + e.getMessage(), fileName.getName());
+            e.printStackTrace();
+            log.warn("File left at '{}'", fileName.getAbsolutePath());
+            return;
+        }
 
-            if (deleteAfter) {
+        if (deleteAfter) {
+            try {
                 log.info("Delete local file version '{}'", fileName.getAbsolutePath());
                 Files.deleteIfExists(fileName.toPath());
+            } catch (IOException e) {
+                log.warn("Couldn't delete file '{}': " + e.getMessage(), fileName.getName());
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-        log.error("Couldn't upload file: " + e.getMessage());
-            e.printStackTrace();
-        }
+        } else log.info("File left at '{}'", fileName.getAbsolutePath());
     }
 }
