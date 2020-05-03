@@ -6,6 +6,7 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -13,72 +14,63 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
-import java.util.List;
 
 public class DiskGoogle {
-    private static final String APPLICATION_NAME = "Google Drive API Java Quickstart";
+
+    private static final Logger log = LoggerFactory.getLogger(DiskGoogle.class);
+    private static final String APPLICATION_NAME = "SoundRecoder";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
+    private static final java.io.File CREDENTIALS_FOLDER = new java.io.File("src/main/resources");
 
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * If modifying these scopes, delete your previously saved tokens/ folder.
-     */
-    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_METADATA_READONLY);
-    private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
+    private NetHttpTransport HTTP_TRANSPORT;
+    private java.io.File clientSecretFilePath = new java.io.File("src/main/resources/client_secrets.json");
+    private GoogleClientSecrets clientSecrets;
+    private GoogleAuthorizationCodeFlow flow;
+    private Credential credential;
+    private Drive drive;
 
-    /**
-     * Creates an authorized Credential object.
-     * @param HTTP_TRANSPORT The network HTTP Transport.
-     * @return An authorized Credential object.
-     * @throws IOException If the credentials.json file cannot be found.
-     */
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
-        // Load client secrets.
-        InputStream in = DiskGoogle.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+    public DiskGoogle() {
+        try {
+            log.info("Build a new authorized Google API client service");
+            HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            log.info("Load client secrets");
+            clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(new FileInputStream(clientSecretFilePath)));
+            log.info("Build flow and trigger user authorization request");
+            flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
+                    clientSecrets, Collections.singleton(DriveScopes.DRIVE_FILE))
+                    .setDataStoreFactory(new FileDataStoreFactory(CREDENTIALS_FOLDER))
+                    .setAccessType("offline").build();
+            log.info("Read client_secret.json file");
+            credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        } catch (GeneralSecurityException e) {
+            log.error("Couldn't get Google transport: " + e.getMessage());
+            e.printStackTrace();
+        } catch (IOException e) {
+            log.error("Couldn't authorize: " + e.getMessage());
+            e.printStackTrace();
         }
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-                .setAccessType("offline")
-                .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        log.info("Create Google Drive service");
+        drive = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
     }
 
-    public void upload() throws IOException, GeneralSecurityException {
-        // Build a new authorized API client service.
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                .setApplicationName(APPLICATION_NAME)
-                .build();
-
-        // Print the names and IDs for up to 10 files.
-        FileList result = service.files().list()
-                .setPageSize(10)
-                .setFields("nextPageToken, files(id, name)")
-                .execute();
-        List<File> files = result.getFiles();
-        if (files == null || files.isEmpty()) {
-            System.out.println("No files found.");
-        } else {
-            System.out.println("Files:");
-            for (File file : files) {
-                System.out.printf("%s (%s)\n", file.getName(), file.getId());
-            }
+    public void uploadFile(java.io.File fileName) {
+        File fileMetadata = new File();
+        fileMetadata.setName(fileName.getName());
+        FileContent mediaContent = new FileContent("media/wave", fileName);
+        try {
+            log.error("Uploading '{}' to Google Disk", fileName.getName());
+            drive.files().create(fileMetadata, mediaContent).execute();
+        } catch (IOException e) {
+        log.error("Couldn't upload file: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
