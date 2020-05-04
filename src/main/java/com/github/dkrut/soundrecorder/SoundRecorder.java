@@ -11,6 +11,8 @@ import java.util.Date;
 public class SoundRecorder
 {
     private static final Logger log = LoggerFactory.getLogger(SoundRecorder.class);
+    private static final String DROPBOX = "dropbox";
+    private static final String GOOGLE_DISK = "google";
     private AudioFileFormat.Type fileType;
     private TargetDataLine line;
     private AudioFormat audioFormat;
@@ -35,10 +37,10 @@ public class SoundRecorder
         }
     }
 
-    public void recordSound(long milliseconds) {
+    public void recordSound(long milliseconds, String cloud, boolean deleteAfter) {
         File file = new File(formatter.format(new Date(System.currentTimeMillis())) + ".wav");
         start(file);
-        delayFinish(file, milliseconds);
+        delayFinish(file, milliseconds, cloud, deleteAfter);
     }
 
     private void start(File file) {
@@ -60,10 +62,7 @@ public class SoundRecorder
         }).start();
     }
 
-    private void delayFinish(File fileName, long delayTime) {
-        Property property = new Property();
-        String cloud = property.getProperty("cloud").toLowerCase();
-        boolean deleteAfter = Boolean.parseBoolean(property.getProperty("deleteAfter"));
+    private void delayFinish(File fileName, long delayTime, String cloud, boolean deleteAfter) {
         new Thread(() ->
         {
             try
@@ -73,12 +72,12 @@ public class SoundRecorder
                 line.stop();
                 log.debug("Line close");
                 line.close();
-                if (cloud.equals("dropbox")) {
+                if (cloud.equals(DROPBOX)) {
                     DiskDropbox diskDropbox = new DiskDropbox();
                     diskDropbox.uploadFile(fileName, deleteAfter);
                     return;
                 }
-                if (cloud.equals("google")) {
+                if (cloud.equals(GOOGLE_DISK)) {
                     DiskGoogle diskGoogle = new DiskGoogle();
                     diskGoogle.uploadFile(fileName, deleteAfter);
                 }

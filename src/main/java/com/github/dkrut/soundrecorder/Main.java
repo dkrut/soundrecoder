@@ -13,16 +13,23 @@ public class Main {
     public static void main(String[] args) {
         SoundRecorder recorder = new SoundRecorder();
         Property property = new Property();
+
+        String cloud = property.getProperty("cloud").toLowerCase();
+        log.info("Cloud to upload file: " + cloud);
+
         long milliseconds = Integer.parseInt(property.getProperty("duration"));
-        log.info("Recording length value = " + milliseconds + " milliseconds");
+        log.info("Recording duration: " + milliseconds + " milliseconds");
+
+        boolean deleteAfter = Boolean.parseBoolean(property.getProperty("deleteAfter"));
+        log.info("Delete file after uploading to cloud '{}': " + deleteAfter, cloud);
 
         int iterationsCount = Integer.parseInt(property.getProperty("iterationsCount"));
-        log.info("Iterations count = " + iterationsCount);
+        log.info("Iterations count: " + iterationsCount);
 
         try {
             for (int i = 0; i < iterationsCount; i++) {
                 log.info("Start iteration " + (i+1) + "/" + iterationsCount);
-                recorder.recordSound(milliseconds);
+                recorder.recordSound(milliseconds, cloud, deleteAfter);
                 Thread.sleep(milliseconds);
             }
         } catch (InterruptedException e) {
