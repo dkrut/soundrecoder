@@ -24,7 +24,7 @@ public class Property {
         log.debug("Get property '{}'", propertyName);
         String property = properties.getProperty(propertyName);
         if (property == null) {
-            log.error("Not find property '{}' in '{}'", propertyName, PROPERTY_FILE );
+            log.error("Not found property '{}' in '{}'", propertyName, PROPERTY_FILE );
             return "0";
         }
         else return property;
