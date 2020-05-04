@@ -63,6 +63,7 @@ public class SoundRecorder
     private void delayFinish(File fileName, long delayTime) {
         Property property = new Property();
         String cloud = property.getProperty("cloud").toLowerCase();
+        boolean deleteAfter = Boolean.parseBoolean(property.getProperty("deleteAfter"));
         new Thread(() ->
         {
             try
@@ -74,12 +75,12 @@ public class SoundRecorder
                 line.close();
                 if (cloud.equals("dropbox")) {
                     DiskDropbox diskDropbox = new DiskDropbox();
-                    diskDropbox.uploadFile(fileName, true);
+                    diskDropbox.uploadFile(fileName, deleteAfter);
                     return;
                 }
                 if (cloud.equals("google")) {
                     DiskGoogle diskGoogle = new DiskGoogle();
-                    diskGoogle.uploadFile(fileName, true);
+                    diskGoogle.uploadFile(fileName, deleteAfter);
                 }
                 else {
                     log.warn("File '{}' not uploaded to cloud. Check 'cloud' value in 'app.properties'. " +

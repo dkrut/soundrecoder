@@ -12,10 +12,10 @@ public class Main {
 
     public static void main(String[] args) {
         SoundRecorder recorder = new SoundRecorder();
-        long milliseconds = 60000;
+        Property property = new Property();
+        long milliseconds = Integer.parseInt(property.getProperty("duration"));
         log.info("Recording length value = " + milliseconds + " milliseconds");
 
-        Property property = new Property();
         int iterationsCount = Integer.parseInt(property.getProperty("iterationsCount"));
         log.info("Iterations count = " + iterationsCount);
 

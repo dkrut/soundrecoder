@@ -62,7 +62,7 @@ public class DiskGoogle {
         drive = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME).build();
     }
 
-    public void uploadFile(java.io.File fileName, Boolean deleteAfter) {
+    public void uploadFile(java.io.File fileName, boolean deleteAfter) {
         File fileMetadata = new File();
         fileMetadata.setName(fileName.getName());
         FileContent mediaContent = new FileContent("media/wave", fileName);

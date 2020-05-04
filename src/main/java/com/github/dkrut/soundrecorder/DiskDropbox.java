@@ -23,7 +23,7 @@ public class DiskDropbox {
         client = new DbxClientV2(config, property.getProperty("dropbox_access_token"));
     }
 
-    public void uploadFile(File fileName, Boolean deleteAfter) {
+    public void uploadFile(File fileName, boolean deleteAfter) {
         try {
             InputStream in = new FileInputStream(fileName);
             log.info("Uploading file '{}' to Dropbox...", fileName.getName());
